@@ -3,7 +3,6 @@ package pizza.italianprogrammer.utils.rest
 import org.apache.commons.codec.CharEncoding.UTF_8
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
-import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.*
 
@@ -14,9 +13,9 @@ class URIResolver
 /**
  * Create an instance of the factory
  *
- * @param baseUrl   the base url to start with ([String.format] style)
+ * @param baseUrl   the base url to start with ([java.lang.String.format] style)
  * @param variables the parameters to replace in the URL, place it in order
- * @see String.format
+ * @see java.lang.String.format
  */
 (baseUrl: String, vararg variables: Any) {
     private val queryParameters = ArrayList<Parameter>()
@@ -28,7 +27,7 @@ class URIResolver
         if (variables.isEmpty()) {
             this.baseUrl = baseUrl
         } else {
-            this.baseUrl = String.format(baseUrl, *variables)
+            this.baseUrl = baseUrl.format(*variables)
         }
     }
 
@@ -48,7 +47,7 @@ class URIResolver
         var intValue = value.toString()
 
         if (substitutions.isNotEmpty()) {
-            intValue = String.format(value.toString(), *substitutions)
+            intValue = value.toString().format(*substitutions)
         }
 
         log.debug("[{}] Adding query parameter {}={}", clazzName, name, intValue)
@@ -59,9 +58,9 @@ class URIResolver
     /**
      * Appends a portion of URL
      *
-     * @param url       the url portion to append with ([String.format] style)
+     * @param url       the url portion to append with ([java.lang.String.format] style)
      * @param variables the parameters to replace in the URL, place it in order
-     * @see String.format
+     * @see java.lang.String.format
      */
     fun append(url: String, vararg variables: Any): URIResolver {
         log.debug("[{}] adding portion of urlbaseUrl {}, portion {}, variables {}", clazzName, this.baseUrl, url, variables)
@@ -71,7 +70,7 @@ class URIResolver
         if (variables.isEmpty()) {
             this.baseUrl += url
         } else {
-            this.baseUrl += String.format(url, *variables)
+            this.baseUrl += url.format(*variables)
         }
 
         return this
@@ -82,34 +81,30 @@ class URIResolver
      *
      * @return the built URL
      */
-    override fun toString(): String {
+    fun build(): String {
         val url = StringBuilder()
 
         url.append(baseUrl)
         if (queryParameters.isNotEmpty()) {
             url.append(Parameter.QUERY)
-            url.append(queryParameters.map { it.toString() }.joinToString { Parameter.SEPARATOR })
+            url.append(queryParameters.joinToString(Parameter.SEPARATOR) { it.build() })
         }
 
         return url.toString()
     }
 
+    override fun toString(): String = this.build()
+
     /**
      * Utility for handling parameters
      */
-    class Parameter(name: String, value: Any) {
-
-        private val name: String
-        private val value: String
+    class Parameter(val name: String, val value: Any) {
 
         init {
             if (StringUtils.isEmpty(name))
                 throw IllegalArgumentException("the parameter name is required")
             if (StringUtils.isEmpty(value.toString()))
                 throw IllegalArgumentException("the parameter value is required")
-
-            this.name = name.trim { it <= ' ' }
-            this.value = value.toString().trim { it <= ' ' }
         }
 
         /**
@@ -118,15 +113,10 @@ class URIResolver
          * @return parameter as formatted string eg. `name=Foo+Bar`
          * @see URLEncoder.encode
          */
-        override fun toString(): String {
-            return try {
-                String.format("%s=%s", URLEncoder.encode(this.name, UTF_8),
-                        URLEncoder.encode(this.value, UTF_8))
-            } catch (e: UnsupportedEncodingException) {
-                log.warn("[PARAMETER_TOSTRING] UnsupportedEncodingException while serializing the object, will return empty", e)
-                ""
-            }
-        }
+        fun build(): String =
+                "${URLEncoder.encode(name.trim(), UTF_8)}=${URLEncoder.encode(value.toString().trim(), UTF_8)}"
+
+        override fun toString(): String = this.build()
 
         companion object {
             const val SEPARATOR = "&"

@@ -19,7 +19,7 @@ class URIResolver
  */
 (baseUrl: String, vararg variables: Any) {
     private val queryParameters = ArrayList<Parameter>()
-    private var baseUrl: String? = null
+    private var baseUrl: String = ""
 
     init {
         log.debug("[{}] Creating a new Resolver, baseUrl {}, variables {}", clazzName, baseUrl, variables)
@@ -65,7 +65,7 @@ class URIResolver
     fun append(url: String, vararg variables: Any): URIResolver {
         log.debug("[{}] adding portion of urlbaseUrl {}, portion {}, variables {}", clazzName, this.baseUrl, url, variables)
 
-        if (!this.baseUrl!!.endsWith("/")) this.baseUrl += "/"
+        if (!this.baseUrl.endsWith("/") && !url.startsWith("/")) this.baseUrl += "/"
 
         if (variables.isEmpty()) {
             this.baseUrl += url

@@ -33,14 +33,16 @@ class URIResolverTest {
         val param2Value = "spiderman"
         val param3Value = "mr robot" + "test/%s/variable"
 
-        val expected = "my/%s/valuable/%s/url/%s/detail?%s=%s&%s=%s&%s=%s".format(
+        val expected = "my/%s/valuable/%s/url/%s/detail/fake/path?%s=%s&%s=%s&%s=%s".format(
                 value1, value2, value3,
                 encode(param1Key), encode(param1Value),
                 encode(param2Key), encode(param2Value),
                 encode(param3Key), encode(String.format(param3Value, "test")))
 
         val result = URIResolver("my/%s/valuable/%s/url", value1, value2)
-                .append("%s/detail", value3)
+                .append("%s/detail/", value3)
+                .append("fake/")
+                .append("/path")
                 .queryParameters(URIResolver.Parameter(param1Key, param1Value))
                 .queryParameter(param2Key, param2Value)
                 .queryParameter(param3Key, param3Value, "test")

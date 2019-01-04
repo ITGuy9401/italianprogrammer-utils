@@ -47,7 +47,7 @@ class URIResolver
     fun queryParameter(name: String, value: Any, vararg substitutions: Any): URIResolver {
         var intValue = value.toString()
 
-        if (substitutions != null && substitutions.size > 0) {
+        if (substitutions.isNotEmpty()) {
             intValue = String.format(value.toString(), *substitutions)
         }
 
@@ -129,9 +129,9 @@ class URIResolver
         }
 
         companion object {
-            val SEPARATOR = "&"
-            val QUERY = "?"
-            val HASH = "#"
+            const val SEPARATOR = "&"
+            const val QUERY = "?"
+            const val HASH = "#"
         }
 
     }

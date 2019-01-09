@@ -65,7 +65,13 @@ class URIResolver
     fun append(url: String, vararg variables: Any): URIResolver {
         log.debug("[{}] adding portion of urlbaseUrl {}, portion {}, variables {}", clazzName, this.baseUrl, url, variables)
 
-        if (!this.baseUrl.endsWith("/") && !url.startsWith("/")) this.baseUrl += "/"
+        if (!this.baseUrl.endsWith("/") && !url.startsWith("/")) {
+            this.baseUrl += "/"
+        }
+
+        if (this.baseUrl.endsWith("/") && url.startsWith("/")) {
+            this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length - 1)
+        }
 
         if (variables.isEmpty()) {
             this.baseUrl += url

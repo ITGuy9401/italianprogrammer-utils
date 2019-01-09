@@ -6,6 +6,6 @@ package pizza.italianprogrammer.utils.commons
  * without the Kotlin STDLib
  */
 data class Pair<A, B>(
-        val key: A? = null,
-        val value: B? = null
+        val key: A,
+        val value: B
 )
